@@ -10,16 +10,18 @@ router.get('/:invoiceNumber', async (req, res) => {
       return res.status(404).send('Invoice not found');
     }
 
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
     // Send an HTML page that automatically redirects
     res.send(`
       <!DOCTYPE html>
       <html>
         <head>
-          <meta http-equiv="refresh" content="0;url=http://localhost:5173/view/${req.params.invoiceNumber}">
+          <meta http-equiv="refresh" content="0;url=${frontendUrl}/view/${req.params.invoiceNumber}">
         </head>
         <body>
           <script>
-            window.location.href = 'http://localhost:5173/view/${req.params.invoiceNumber}';
+            window.location.href = '${frontendUrl}/view/${req.params.invoiceNumber}';
           </script>
           Redirecting to invoice...
         </body>

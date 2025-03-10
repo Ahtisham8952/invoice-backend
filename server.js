@@ -41,7 +41,12 @@ const startServer = async () => {
 
     // Middleware
     app.use(cors({
-      origin: ['http://localhost:5173', 'http://localhost:5000'], // Allow both frontend and backend URLs
+      origin: [
+        'http://localhost:5173',
+        'https://invoice-frontned.vercel.app',
+        'http://localhost:5000',
+        'https://invoice-backend-ruddy.vercel.app'
+      ],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization']
