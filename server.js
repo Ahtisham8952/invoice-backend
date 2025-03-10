@@ -64,7 +64,7 @@ const startServer = async () => {
     app.use('/api/auth', authRoutes);
     
     // Unprotected route for viewing single invoice (must be before protected routes)
-    app.get('/invoices/:invoiceNumber', async (req, res) => {
+    app.get('/api/invoices/:invoiceNumber', async (req, res) => {
       try {
         const invoice = await Invoice.findOne({ invoiceNumber: req.params.invoiceNumber });
         if (!invoice) {
