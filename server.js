@@ -62,8 +62,9 @@ const startServer = async () => {
 
     // Routes with /api prefix
     app.use('/api/auth', authRoutes);
-    app.use('/api/invoices', auth, invoiceRoutes); // Keep the main invoice routes protected
-    app.get('/api/invoices/:invoiceNumber', async (req, res) => { // Add unprotected route for viewing single invoice
+    
+    // Unprotected route for viewing single invoice (must be before protected routes)
+    app.get('/api/invoices/:invoiceNumber', async (req, res) => {
       try {
         const invoice = await Invoice.findOne({ invoiceNumber: req.params.invoiceNumber });
         if (!invoice) {
@@ -74,6 +75,9 @@ const startServer = async () => {
         res.status(500).json({ message: error.message });
       }
     });
+
+    // Protected invoice routes
+    app.use('/api/invoices', auth, invoiceRoutes);
     
     // Redirect route without /api prefix
     app.use('/i', redirectRoutes);
