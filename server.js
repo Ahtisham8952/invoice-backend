@@ -63,7 +63,7 @@ const startServer = async () => {
     // Routes with /api prefix
     app.use('/api/auth', authRoutes);
     
-    // Unprotected route for viewing single invoice (must be before protected routes)
+    // Unprotected routes
     app.get('/api/invoices/:invoiceNumber', async (req, res) => {
       try {
         const invoice = await Invoice.findOne({ invoiceNumber: req.params.invoiceNumber });
@@ -75,13 +75,11 @@ const startServer = async () => {
         res.status(500).json({ message: error.message });
       }
     });
+    app.use('/i', redirectRoutes); // Keep redirect route before protected routes
 
     // Protected invoice routes
     app.use('/api/invoices', auth, invoiceRoutes);
     
-    // Redirect route without /api prefix
-    app.use('/i', redirectRoutes);
-
     // Handle 404
     app.use((req, res) => {
       console.log(`404 Not Found: ${req.method} ${req.url}`);

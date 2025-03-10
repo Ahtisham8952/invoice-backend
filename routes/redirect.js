@@ -11,8 +11,6 @@ router.get('/:invoiceNumber', async (req, res) => {
     }
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-
-    // Redirect directly instead of sending HTML
     res.redirect(`${frontendUrl}/view/${req.params.invoiceNumber}`);
   } catch (error) {
     res.status(500).send('Server error');
