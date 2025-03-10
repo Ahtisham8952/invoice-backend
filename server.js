@@ -36,38 +36,41 @@ const startServer = async () => {
     await connectDB();
     console.log('✅ MongoDB Connected');
     
-    // Initialize admin user after DB connection
     await initializeAdmin();
 
     // Middleware
     app.use(cors({
-      origin: function(origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if(!origin) return callback(null, true);
-        
-        const allowedOrigins = [
-          'http://localhost:5173',
-          'https://invoice-frontned.vercel.app',
-          'http://localhost:5000',
-          'https://invoice-backend-ruddy.vercel.app'
-        ];
-        
-        if(allowedOrigins.indexOf(origin) === -1){
-          console.log('Origin not allowed:', origin);
-        }
-        
-        callback(null, true); // Allow all origins during development
-      },
+      origin: ['http://localhost:5173', 'https://invoice-frontned.vercel.app'],
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization']
     }));
+    
     app.use(express.json());
 
-    // Routes
+    // Add request logging
+    app.use((req, res, next) => {
+      console.log(`Incoming request: ${req.method} ${req.url}`);
+      next();
+    });
+
+    // Test route
+    app.get('/', (req, res) => {
+      res.json({ message: 'Backend API is running' });
+    });
+
+    // Routes with /api prefix
     app.use('/api/auth', authRoutes);
-    app.use('/api/invoices', auth, invoiceRoutes); // Protected routes
-    app.use('/i', redirectRoutes); // Short URL redirect route
+    app.use('/api/invoices', auth, invoiceRoutes);
+    
+    // Redirect route without /api prefix
+    app.use('/i', redirectRoutes);
+
+    // Handle 404
+    app.use((req, res) => {
+      console.log(`404 Not Found: ${req.method} ${req.url}`);
+      res.status(404).json({ message: 'Route not found' });
+    });
 
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
