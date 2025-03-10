@@ -7,6 +7,7 @@ const redirectRoutes = require('./routes/redirect');
 const auth = require('./middleware/auth');
 const User = require('./models/User');
 const bcrypt = require('bcryptjs');
+const Invoice = require('./models/Invoice'); // Add this line to import the Invoice model
 
 const app = express();
 
@@ -61,7 +62,18 @@ const startServer = async () => {
 
     // Routes with /api prefix
     app.use('/api/auth', authRoutes);
-    app.use('/api/invoices', auth, invoiceRoutes);
+    app.use('/api/invoices', auth, invoiceRoutes); // Keep the main invoice routes protected
+    app.get('/api/invoices/:invoiceNumber', async (req, res) => { // Add unprotected route for viewing single invoice
+      try {
+        const invoice = await Invoice.findOne({ invoiceNumber: req.params.invoiceNumber });
+        if (!invoice) {
+          return res.status(404).json({ message: 'Invoice not found' });
+        }
+        res.json(invoice);
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
+    });
     
     // Redirect route without /api prefix
     app.use('/i', redirectRoutes);
